@@ -1,0 +1,35 @@
+version: '3.9'
+services:
+  nginx:
+    build:
+      context: ./docker/development
+      dockerfile: nginx.docker
+    volumes:
+      - ./:/app
+    depends_on:
+      - php-fpm
+      - database
+    ports:
+      - "8080:80"
+  php-fpm:
+    build:
+      context: ./docker/development
+      dockerfile: php-fpm.docker
+    environment:
+      APP_DEBUG: 1
+    volumes:
+      - ./:/app
+
+
+  database:
+    build: docker/development/postgres
+    env_file:
+      - docker/development/database.env # configure postgres
+    ports:
+      - "6432:5432"
+    volumes:
+      - data-pg:/var/lib/postgresql/data
+
+volumes:
+  data-pg:
+    driver: local  # is already local by default
